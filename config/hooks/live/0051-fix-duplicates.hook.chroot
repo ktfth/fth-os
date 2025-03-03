@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Comentar as linhas duplicadas em custom.list
+if [ -f /etc/apt/sources.list.d/custom.list ]; then
+  # Fazer backup do arquivo original
+  cp /etc/apt/sources.list.d/custom.list /etc/apt/sources.list.d/custom.list.bak
+  
+  # Comentar as linhas que se referem aos mesmos repositórios em sources.list
+  grep -F -f /etc/apt/sources.list /etc/apt/sources.list.d/custom.list | 
+  while read -r line; do
+    sed -i "s|^$line|# $line # Commented to avoid duplication|" /etc/apt/sources.list.d/custom.list
+  done
+fi
+
+# Atualizar novamente após as mudanças
+apt-get update

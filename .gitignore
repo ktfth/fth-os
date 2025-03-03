@@ -1,0 +1,22 @@
+# Diretórios gerados pelo live-build
+.build/
+build/
+cache/
+results/
+lb-build/
+
+# Arquivos de imagem gerados (ISO, IMG, etc.)
+*.iso
+*.img
+
+# Arquivos de log e temporários
+*.log
+tmp/
+*.tmp
+
+# Arquivos sensíveis de chaves (opcional: ajuste conforme sua necessidade)
+config/archives/*.key.chroot*
+
+chroot*
+live-image*
+binary*
