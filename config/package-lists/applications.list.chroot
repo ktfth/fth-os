@@ -1,0 +1,40 @@
+# Browsers modernos
+firefox-esr
+chromium
+
+# Ferramentas de design
+gimp
+inkscape
+blender
+krita
+
+# Comunicação
+discord
+telegram-desktop
+
+# Productivity
+libreoffice
+obsidian
+zotero
+
+# Media
+vlc
+audacity
+strawberry
+
+# Utilitários do sistema
+gnome-disk-utility
+gparted
+synaptic
+bleachbit
+timeshift
+
+# Ferramentas de rede
+wireshark
+nmap
+zenmap
+
+# Gaming (Steam via Flatpak será configurado)
+lutris
+gamemode
+steam-installer

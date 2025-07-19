@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Script para instalar aplicações via Flatpak
+
+set -e
+
+echo "Configurando Flatpak e instalando aplicações..."
+
+# Adicionar Flathub repository
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Instalar aplicações essenciais via Flatpak
+echo "Instalando aplicações via Flatpak..."
+
+# Browsers e comunicação
+flatpak install -y flathub org.mozilla.firefox
+flatpak install -y flathub com.google.Chrome
+flatpak install -y flathub com.brave.Browser
+flatpak install -y flathub com.discordapp.Discord
+flatpak install -y flathub org.telegram.desktop
+flatpak install -y flathub com.slack.Slack
+
+# Desenvolvimento
+flatpak install -y flathub com.visualstudio.code
+flatpak install -y flathub io.dbeaver.DBeaverCommunity
+flatpak install -y flathub rest.insomnia.Insomnia
+flatpak install -y flathub com.getpostman.Postman
+flatpak install -y flathub com.github.gi_lom.dialect
+flatpak install -y flathub md.obsidian.Obsidian
+
+# Design e mídia
+flatpak install -y flathub org.gimp.GIMP
+flatpak install -y flathub org.inkscape.Inkscape
+flatpak install -y flathub org.blender.Blender
+flatpak install -y flathub org.kde.krita
+flatpak install -y flathub com.adobe.Flash-Player-projector
+flatpak install -y flathub org.videolan.VLC
+flatpak install -y flathub org.audacityteam.Audacity
+
+# Produtividade
+flatpak install -y flathub org.libreoffice.LibreOffice
+flatpak install -y flathub com.notepadqq.Notepadqq
+flatpak install -y flathub org.zotero.Zotero
+flatpak install -y flathub com.bitwarden.desktop
+
+# Gaming
+flatpak install -y flathub com.valvesoftware.Steam
+flatpak install -y flathub net.lutris.Lutris
+flatpak install -y flathub org.prismlauncher.PrismLauncher
+
+# Utilitários
+flatpak install -y flathub org.filezillaproject.Filezilla
+flatpak install -y flathub com.transmissionbt.Transmission
+flatpak install -y flathub org.remmina.Remmina
+flatpak install -y flathub com.github.tchx84.Flatseal
+
+# Criar aliases para aplicações Flatpak
+mkdir -p /etc/skel/.local/bin
+
+cat > /etc/skel/.local/bin/flatpak-aliases.sh << 'EOF'
+#!/bin/bash
+# Aliases para aplicações Flatpak
+
+alias chrome='flatpak run com.google.Chrome'
+alias brave='flatpak run com.brave.Browser'
+alias discord='flatpak run com.discordapp.Discord'
+alias telegram='flatpak run org.telegram.desktop'
+alias slack='flatpak run com.slack.Slack'
+alias vscode='flatpak run com.visualstudio.code'
+alias dbeaver='flatpak run io.dbeaver.DBeaverCommunity'
+alias insomnia='flatpak run rest.insomnia.Insomnia'
+alias postman='flatpak run com.getpostman.Postman'
+alias obsidian='flatpak run md.obsidian.Obsidian'
+alias gimp='flatpak run org.gimp.GIMP'
+alias inkscape='flatpak run org.inkscape.Inkscape'
+alias blender='flatpak run org.blender.Blender'
+alias krita='flatpak run org.kde.krita'
+alias vlc='flatpak run org.videolan.VLC'
+alias audacity='flatpak run org.audacityteam.Audacity'
+alias libreoffice='flatpak run org.libreoffice.LibreOffice'
+alias zotero='flatpak run org.zotero.Zotero'
+alias bitwarden='flatpak run com.bitwarden.desktop'
+alias steam='flatpak run com.valvesoftware.Steam'
+alias lutris='flatpak run net.lutris.Lutris'
+alias minecraft='flatpak run org.prismlauncher.PrismLauncher'
+alias filezilla='flatpak run org.filezillaproject.Filezilla'
+alias transmission='flatpak run com.transmissionbt.Transmission'
+alias remmina='flatpak run org.remmina.Remmina'
+alias flatseal='flatpak run com.github.tchx84.Flatseal'
+EOF
+
+chmod +x /etc/skel/.local/bin/flatpak-aliases.sh
+
+# Adicionar aliases ao fish
+echo "" >> /etc/skel/.config/fish/config.fish
+echo "# Flatpak aliases" >> /etc/skel/.config/fish/config.fish
+echo "source ~/.local/bin/flatpak-aliases.sh" >> /etc/skel/.config/fish/config.fish
+
+# Adicionar ao bashrc também
+echo "" >> /etc/skel/.bashrc
+echo "# Flatpak aliases" >> /etc/skel/.bashrc
+echo "source ~/.local/bin/flatpak-aliases.sh" >> /etc/skel/.bashrc
+
+echo "Flatpak configurado e aplicações instaladas!"

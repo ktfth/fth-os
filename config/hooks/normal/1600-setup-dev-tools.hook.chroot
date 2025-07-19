@@ -1,0 +1,268 @@
+#!/bin/bash
+
+# Script para configurar ferramentas avançadas de desenvolvimento web
+
+set -e
+
+echo "Configurando ferramentas avançadas de desenvolvimento..."
+
+# Instalar Node Version Manager (NVM)
+echo "Instalando NVM..."
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash || true
+
+# Instalar Rust e Cargo
+echo "Instalando Rust..."
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y || true
+
+# Instalar Go tools
+echo "Configurando Go tools..."
+export GOPATH=/usr/local/go
+go install github.com/jesseduffield/lazygit@latest || true
+go install github.com/charmbracelet/glow@latest || true
+
+# Instalar Python tools
+echo "Configurando Python tools..."
+pip3 install --user poetry
+pip3 install --user black
+pip3 install --user flake8
+pip3 install --user mypy
+pip3 install --user pytest
+pip3 install --user jupyter
+pip3 install --user django
+pip3 install --user fastapi
+pip3 install --user flask
+pip3 install --user requests
+pip3 install --user beautifulsoup4
+pip3 install --user pandas
+pip3 install --user numpy
+pip3 install --user matplotlib
+
+# Configurar Docker para usuário
+echo "Configurando Docker..."
+groupadd -f docker
+usermod -aG docker $USER || true
+
+# Instalar algumas extensões do VSCodium via script
+echo "Configurando VSCodium extensions..."
+mkdir -p /etc/skel/.vscode-oss/extensions
+
+# Criar script para instalar extensões no primeiro login
+cat > /etc/skel/.local/bin/install-vscode-extensions.sh << 'EOF'
+#!/bin/bash
+# Script para instalar extensões úteis do VSCodium
+
+extensions=(
+    "ms-python.python"
+    "rust-lang.rust-analyzer"
+    "bradlc.vscode-tailwindcss"
+    "esbenp.prettier-vscode"
+    "ms-vscode.vscode-typescript-next"
+    "formulahendry.auto-rename-tag"
+    "christian-kohler.path-intellisense"
+    "ms-vscode.vscode-json"
+    "redhat.vscode-yaml"
+    "ms-vscode.vscode-eslint"
+    "GitLab.gitlab-workflow"
+    "ms-vscode-remote.remote-containers"
+    "ms-azuretools.vscode-docker"
+    "golang.go"
+    "ms-vscode.hexeditor"
+    "vscodevim.vim"
+    "github.copilot"
+    "github.copilot-chat"
+)
+
+for ext in "${extensions[@]}"; do
+    codium --install-extension "$ext" --force
+done
+EOF
+
+chmod +x /etc/skel/.local/bin/install-vscode-extensions.sh
+mkdir -p /etc/skel/.local/bin
+
+# Configurar Git globalmente com configurações sensatas
+cat > /etc/skel/.gitconfig << 'EOF'
+[user]
+    name = Usuario
+    email = usuario@localhost
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = nvim
+    pager = delta
+
+[merge]
+    tool = vimdiff
+
+[diff]
+    tool = vimdiff
+    colorMoved = default
+
+[delta]
+    navigate = true
+    light = false
+    side-by-side = true
+
+[interactive]
+    diffFilter = delta --color-only
+
+[pull]
+    rebase = false
+
+[push]
+    default = simple
+    autoSetupRemote = true
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    up = !git remote update -p; git merge --ff-only @{u}
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+EOF
+
+# Configurar Neovim básico
+mkdir -p /etc/skel/.config/nvim
+cat > /etc/skel/.config/nvim/init.vim << 'EOF'
+" Configuração básica do Neovim
+
+set number
+set relativenumber
+set autoindent
+set tabstop=4
+set shiftwidth=4
+set smarttab
+set softtabstop=4
+set mouse=a
+set encoding=UTF-8
+set clipboard=unnamedplus
+
+" Syntax highlighting
+syntax on
+
+" Color scheme
+colorscheme desert
+
+" Key mappings
+nnoremap <C-s> :w<CR>
+inoremap <C-s> <Esc>:w<CR>a
+nnoremap <C-q> :q<CR>
+
+" Split navigation
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+EOF
+
+# Instalar Oh My Zsh para usuarios que preferirem bash/zsh
+echo "Configurando Zsh..."
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended || true
+
+# Configurar tmux
+cat > /etc/skel/.tmux.conf << 'EOF'
+# Configuração do tmux
+
+# Mudar prefix para Ctrl+a
+set -g prefix C-a
+unbind C-b
+bind-key C-a send-prefix
+
+# Recarregar config
+bind r source-file ~/.tmux.conf \; display-message "Config reloaded!"
+
+# Split panes
+bind | split-window -h
+bind - split-window -v
+unbind '"'
+unbind %
+
+# Navegação entre panes
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Resize panes
+bind J resize-pane -D 5
+bind K resize-pane -U 5
+bind H resize-pane -L 5
+bind L resize-pane -R 5
+
+# Enable mouse mode
+set -g mouse on
+
+# Colors
+set -g default-terminal "screen-256color"
+set -g status-bg colour235
+set -g status-fg colour136
+set -g status-left-length 20
+set -g status-left '#[fg=green][#S] #(whoami)@#H#[default]'
+set -g status-right '#[fg=yellow]%d %b %Y #[fg=green]%H:%M:%S#[default]'
+
+# Window status
+setw -g window-status-current-format '#[fg=colour81,bg=colour238,bold] #I#[fg=colour250]:#[fg=colour255]#W#[fg=colour81]#F #[fg=colour238,bg=colour235,nobold]'
+EOF
+
+# Configurar ambiente para desenvolvimento
+echo "Criando diretórios de desenvolvimento..."
+mkdir -p /etc/skel/Development/{web,mobile,desktop,scripts,learning}
+mkdir -p /etc/skel/Development/web/{react,vue,angular,svelte,vanilla}
+mkdir -p /etc/skel/Development/mobile/{flutter,react-native,ionic}
+mkdir -p /etc/skel/Development/desktop/{electron,tauri,gtk,qt}
+
+# Criar script de bem-vindo
+cat > /etc/skel/.local/bin/welcome.sh << 'EOF'
+#!/bin/bash
+
+echo "========================================="
+echo "🚀 Bem-vindo ao FTH OS Development!"
+echo "========================================="
+echo ""
+echo "🌟 Ferramentas instaladas:"
+echo "  • Hyprland - Compositor Wayland moderno"
+echo "  • Kitty - Terminal GPU-accelerated"
+echo "  • Fish Shell + Starship - Shell moderno"
+echo "  • VSCodium - Editor de código"
+echo "  • Neovim - Editor modal avançado"
+echo "  • Docker & Podman - Containerização"
+echo "  • Node.js, Python, Go, Rust - Linguagens"
+echo "  • Git tools (lazygit, tig, delta)"
+echo "  • Modern CLI tools (bat, exa, ripgrep, fd)"
+echo ""
+echo "🔧 Para começar:"
+echo "  • Super+Q: Abrir terminal"
+echo "  • Super+R: Menu de aplicações"
+echo "  • Super+E: Gerenciador de arquivos"
+echo "  • PrintScreen: Screenshot"
+echo ""
+echo "📚 Diretórios criados:"
+echo "  • ~/Development/web - Projetos web"
+echo "  • ~/Development/mobile - Apps mobile"
+echo "  • ~/Development/desktop - Apps desktop"
+echo ""
+echo "⚡ Comandos úteis:"
+echo "  • install-vscode-extensions.sh - Instalar extensões VSCodium"
+echo "  • htop/btop - Monitor do sistema"
+echo "  • lazygit - Git interface"
+echo ""
+echo "========================================="
+EOF
+
+chmod +x /etc/skel/.local/bin/welcome.sh
+
+# Adicionar welcome ao .bashrc e .zshrc
+echo "" >> /etc/skel/.bashrc
+echo "# FTH OS Welcome" >> /etc/skel/.bashrc
+echo "~/.local/bin/welcome.sh" >> /etc/skel/.bashrc
+
+echo "" >> /etc/skel/.zshrc
+echo "# FTH OS Welcome" >> /etc/skel/.zshrc
+echo "~/.local/bin/welcome.sh" >> /etc/skel/.zshrc
+
+echo "Configuração avançada concluída!"

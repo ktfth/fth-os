@@ -1,0 +1,687 @@
+#!/bin/bash
+
+# Script para configurar o ambiente Hyprland pós-instalação
+
+set -e
+
+echo "Configurando ambiente Hyprland..."
+
+# Criar diretório de configuração do Hyprland
+mkdir -p /etc/skel/.config/hypr
+mkdir -p /etc/skel/.config/waybar
+mkdir -p /etc/skel/.config/wofi
+mkdir -p /etc/skel/.config/kitty
+mkdir -p /etc/skel/.config/mako
+
+# Configuração básica do Hyprland
+cat > /etc/skel/.config/hypr/hyprland.conf << 'EOF'
+# Hyprland Configuration
+
+# Monitor configuration
+monitor=,preferred,auto,auto
+
+# Execução de programas no início
+exec-once = waybar & mako & gammastep -O 4500
+exec-once = /usr/lib/polkit-kde-authentication-agent-1
+exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
+# Input configuration
+input {
+    kb_layout = br
+    follow_mouse = 1
+    touchpad {
+        natural_scroll = yes
+        disable_while_typing = yes
+        tap-to-click = yes
+    }
+    sensitivity = 0
+}
+
+# General settings
+general {
+    gaps_in = 5
+    gaps_out = 10
+    border_size = 2
+    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+    col.inactive_border = rgba(595959aa)
+    resize_on_border = false
+    allow_tearing = false
+    layout = dwindle
+}
+
+# Decoration
+decoration {
+    rounding = 10
+    active_opacity = 1.0
+    inactive_opacity = 0.9
+    drop_shadow = yes
+    shadow_range = 4
+    shadow_render_power = 3
+    col.shadow = rgba(1a1a1aee)
+    blur {
+        enabled = true
+        size = 3
+        passes = 1
+        vibrancy = 0.1696
+    }
+}
+
+# Animations
+animations {
+    enabled = yes
+    bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+    animation = windows, 1, 7, myBezier
+    animation = windowsOut, 1, 7, default, popin 80%
+    animation = border, 1, 10, default
+    animation = borderangle, 1, 8, default
+    animation = fade, 1, 7, default
+    animation = workspaces, 1, 6, default
+}
+
+# Layout
+dwindle {
+    pseudotile = yes
+    preserve_split = yes
+}
+
+# Key bindings
+$mainMod = SUPER
+
+bind = $mainMod, Q, exec, kitty
+bind = $mainMod, C, killactive,
+bind = $mainMod, M, exit,
+bind = $mainMod, E, exec, thunar
+bind = $mainMod, V, togglefloating,
+bind = $mainMod, R, exec, wofi --show drun
+bind = $mainMod, P, pseudo,
+bind = $mainMod, J, togglesplit,
+
+# Move focus
+bind = $mainMod, left, movefocus, l
+bind = $mainMod, right, movefocus, r
+bind = $mainMod, up, movefocus, u
+bind = $mainMod, down, movefocus, d
+
+# Switch workspaces
+bind = $mainMod, 1, workspace, 1
+bind = $mainMod, 2, workspace, 2
+bind = $mainMod, 3, workspace, 3
+bind = $mainMod, 4, workspace, 4
+bind = $mainMod, 5, workspace, 5
+bind = $mainMod, 6, workspace, 6
+bind = $mainMod, 7, workspace, 7
+bind = $mainMod, 8, workspace, 8
+bind = $mainMod, 9, workspace, 9
+bind = $mainMod, 0, workspace, 10
+
+# Move to workspace
+bind = $mainMod SHIFT, 1, movetoworkspace, 1
+bind = $mainMod SHIFT, 2, movetoworkspace, 2
+bind = $mainMod SHIFT, 3, movetoworkspace, 3
+bind = $mainMod SHIFT, 4, movetoworkspace, 4
+bind = $mainMod SHIFT, 5, movetoworkspace, 5
+bind = $mainMod SHIFT, 6, movetoworkspace, 6
+bind = $mainMod SHIFT, 7, movetoworkspace, 7
+bind = $mainMod SHIFT, 8, movetoworkspace, 8
+bind = $mainMod SHIFT, 9, movetoworkspace, 9
+bind = $mainMod SHIFT, 0, movetoworkspace, 10
+
+# Screenshot
+bind = , Print, exec, grim -g "$(slurp)" - | wl-copy
+bind = $mainMod, Print, exec, grim - | wl-copy
+
+# Volume and brightness
+binde = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+binde = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+binde = , XF86MonBrightnessUp, exec, brightnessctl set 10%+
+binde = , XF86MonBrightnessDown, exec, brightnessctl set 10%-
+
+# Move/resize windows
+bindm = $mainMod, mouse:272, movewindow
+bindm = $mainMod, mouse:273, resizewindow
+EOF
+
+# Configuração do Waybar
+cat > /etc/skel/.config/waybar/config << 'EOF'
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 4,
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["idle_inhibitor", "pulseaudio", "network", "cpu", "memory", "temperature", "battery", "clock", "tray"],
+    
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{name}: {icon}",
+        "format-icons": {
+            "1": "",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "urgent": "",
+            "focused": "",
+            "default": ""
+        }
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        }
+    },
+    "tray": {
+        "spacing": 10
+    },
+    "clock": {
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format-alt": "{:%Y-%m-%d}"
+    },
+    "cpu": {
+        "format": "{usage}% ",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "{}% "
+    },
+    "temperature": {
+        "critical-threshold": 80,
+        "format": "{temperatureC}°C {icon}",
+        "format-icons": ["", "", ""]
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "network": {
+        "format-wifi": "{essid} ({signalStrength}%) ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "tooltip-format": "{ifname} via {gwaddr} ",
+        "format-linked": "{ifname} (No IP) ",
+        "format-disconnected": "Disconnected ⚠",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "pulseaudio": {
+        "format": "{volume}% {icon} {format_source}",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": " {format_source}",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    }
+}
+EOF
+
+# Estilo do Waybar
+cat > /etc/skel/.config/waybar/style.css << 'EOF'
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "FiraCode Nerd Font", monospace;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(43, 48, 59, 0.8);
+    border-bottom: 3px solid rgba(100, 114, 125, 0.5);
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+button {
+    box-shadow: inset 0 -3px transparent;
+    border: none;
+    border-radius: 0;
+}
+
+#workspaces button {
+    padding: 0 5px;
+    background-color: transparent;
+    color: #ffffff;
+}
+
+#workspaces button:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#workspaces button.focused {
+    background-color: #64727D;
+    box-shadow: inset 0 -3px #ffffff;
+}
+
+#workspaces button.urgent {
+    background-color: #eb4d4b;
+}
+
+#mode {
+    background-color: #64727D;
+    border-bottom: 3px solid #ffffff;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#network,
+#pulseaudio,
+#tray,
+#mode,
+#idle_inhibitor {
+    padding: 0 10px;
+    color: #ffffff;
+}
+
+#window,
+#workspaces {
+    margin: 0 4px;
+}
+
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+#clock {
+    background-color: #64727D;
+}
+
+#battery {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+#battery.charging, #battery.plugged {
+    color: #ffffff;
+    background-color: #26A65B;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}
+
+#battery.critical:not(.charging) {
+    background-color: #f53c3c;
+    color: #ffffff;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#cpu {
+    background-color: #2ecc71;
+    color: #000000;
+}
+
+#memory {
+    background-color: #9b59b6;
+}
+
+#temperature {
+    background-color: #f0932b;
+}
+
+#temperature.critical {
+    background-color: #eb4d4b;
+}
+
+#tray {
+    background-color: #2980b9;
+}
+
+#network {
+    background-color: #2980b9;
+}
+
+#network.disconnected {
+    background-color: #f53c3c;
+}
+
+#pulseaudio {
+    background-color: #f1c40f;
+    color: #000000;
+}
+
+#pulseaudio.muted {
+    background-color: #90b1b1;
+    color: #2a5c45;
+}
+EOF
+
+# Configuração do Kitty
+cat > /etc/skel/.config/kitty/kitty.conf << 'EOF'
+# Font configuration
+font_family      FiraCode Nerd Font
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+font_size 11.0
+
+# Color scheme
+foreground #f8f8f2
+background #282a36
+selection_foreground #ffffff
+selection_background #44475a
+
+# Black
+color0  #21222c
+color8  #6272a4
+
+# Red
+color1  #ff5555
+color9  #ff6e6e
+
+# Green
+color2  #50fa7b
+color10 #69ff94
+
+# Yellow
+color3  #f1fa8c
+color11 #ffffa5
+
+# Blue
+color4  #bd93f9
+color12 #d6acff
+
+# Magenta
+color5  #ff79c6
+color13 #ff92df
+
+# Cyan
+color6  #8be9fd
+color14 #a4ffff
+
+# White
+color7  #f8f8f2
+color15 #ffffff
+
+# Cursor
+cursor #f8f8f2
+cursor_text_color #282a36
+
+# Tab bar
+active_tab_foreground   #282a36
+active_tab_background   #f8f8f2
+inactive_tab_foreground #f8f8f2
+inactive_tab_background #282a36
+
+# Window layout
+remember_window_size  yes
+initial_window_width  640
+initial_window_height 400
+
+# Advanced
+shell fish
+EOF
+
+# Configuração do Wofi
+cat > /etc/skel/.config/wofi/config << 'EOF'
+width=600
+height=400
+location=center
+show=drun
+prompt=Search...
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+insensitive=true
+allow_images=true
+image_size=40
+gtk_dark=true
+EOF
+
+cat > /etc/skel/.config/wofi/style.css << 'EOF'
+window {
+margin: 0px;
+border: 3px solid #1e1e2e;
+background-color: #1e1e2e;
+border-radius: 10px;
+}
+
+#input {
+margin: 5px;
+border: none;
+color: #cdd6f4;
+background-color: #313244;
+border-radius: 10px;
+}
+
+#inner-box {
+margin: 5px;
+border: none;
+background-color: #1e1e2e;
+border-radius: 10px;
+}
+
+#outer-box {
+margin: 5px;
+border: none;
+background-color: #1e1e2e;
+border-radius: 10px;
+}
+
+#scroll {
+margin: 0px;
+border: none;
+}
+
+#text {
+margin: 5px;
+border: none;
+color: #cdd6f4;
+} 
+
+#entry:selected {
+background-color: #585b70;
+border-radius: 10px;
+}
+
+#text:selected {
+color: #cdd6f4;
+}
+EOF
+
+# Configuração do Mako
+cat > /etc/skel/.config/mako/config << 'EOF'
+sort=-time
+layer=overlay
+background-color=#2e3440
+width=300
+height=110
+border-size=2
+border-color=#88c0d0
+border-radius=15
+icons=0
+max-icon-size=64
+default-timeout=5000
+ignore-timeout=1
+font=FiraCode Nerd Font 10
+
+[urgency=low]
+border-color=#cccccc
+
+[urgency=normal]
+border-color=#d08770
+
+[urgency=high]
+border-color=#bf616a
+default-timeout=0
+
+[category=mpd]
+default-timeout=2000
+group-by=category
+EOF
+
+echo "Configuração do Hyprland concluída!"
+
+# Instalar Oh My Fish para um shell bonito
+echo "Configurando Fish shell..."
+curl -L https://get.oh-my.fish | fish || true
+
+# Instalar Starship prompt
+echo "Instalando Starship prompt..."
+curl -sS https://starship.rs/install.sh | sh -s -- --yes || true
+
+# Configurar Starship
+mkdir -p /etc/skel/.config
+cat > /etc/skel/.config/starship.toml << 'EOF'
+format = """
+[░▒▓](#a3aed2)\
+[  ](bg:#a3aed2 fg:#090c0c)\
+[](bg:#769ff0 fg:#a3aed2)\
+$directory\
+[](fg:#769ff0 bg:#394260)\
+$git_branch\
+$git_status\
+[](fg:#394260 bg:#212736)\
+$nodejs\
+$rust\
+$golang\
+$php\
+$python\
+[](fg:#212736 bg:#1d2230)\
+$time\
+[ ](fg:#1d2230)\
+"""
+
+[directory]
+style = "fg:#e3e5e5 bg:#769ff0"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#394260"
+format = '[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)'
+
+[git_status]
+style = "bg:#394260"
+format = '[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[php]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[python]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "bg:#1d2230"
+format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'
+EOF
+
+# Configurar Fish como shell padrão e Starship
+cat > /etc/skel/.config/fish/config.fish << 'EOF'
+# Starship prompt
+starship init fish | source
+
+# Aliases úteis
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# Git aliases
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias gd='git diff'
+
+# Modern CLI tools
+alias cat='bat'
+alias ls='exa -la --icons'
+alias find='fd'
+alias ps='procs'
+alias du='duf'
+alias top='btop'
+
+# Docker aliases
+alias dps='docker ps'
+alias di='docker images'
+alias dc='docker-compose'
+
+# Development
+alias serve='python3 -m http.server'
+alias nrd='npm run dev'
+alias nrs='npm run start'
+alias nrb='npm run build'
+
+# Set EDITOR
+set -gx EDITOR nvim
+set -gx BROWSER firefox
+
+# Add paths
+fish_add_path ~/.local/bin
+fish_add_path ~/.cargo/bin
+fish_add_path ~/go/bin
+EOF
+
+mkdir -p /etc/skel/.config/fish
+
+# Habilitar Flatpak
+echo "Configurando Flatpak..."
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
+
+echo "Configuração completa!"

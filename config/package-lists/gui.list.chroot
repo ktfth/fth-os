@@ -1,4 +1,15 @@
-xorg
-task-gnome-desktop
-gdm3
-caja
+# Wayland base
+wayland-protocols
+libwayland-client0
+libwayland-cursor0
+libwayland-egl1
+
+# Display manager
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+
+# Xorg para compatibilidade
+xserver-xorg-core
+xserver-xorg-input-all
+xserver-xorg-video-all

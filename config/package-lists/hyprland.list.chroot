@@ -1,0 +1,60 @@
+# Wayland e Hyprland
+hyprland
+wayland-protocols
+wlroots
+xwayland
+sddm
+
+# Terminal e shell modernas
+kitty
+fish
+starship
+
+# Utilitários Wayland
+waybar
+wofi
+swaylock
+swayidle
+grim
+slurp
+wl-clipboard
+mako-notifier
+kanshi
+gammastep
+
+# Fonts bonitas
+fonts-firacode
+fonts-noto
+fonts-noto-color-emoji
+fonts-font-awesome
+
+# Temas e aparência
+papirus-icon-theme
+lxappearance
+qt5ct
+
+# File manager e utilitários
+thunar
+thunar-archive-plugin
+thunar-volman
+gvfs-backends
+tumbler
+
+# Network manager GUI
+network-manager-gnome
+
+# Audio
+pulseaudio
+pavucontrol
+alsa-utils
+
+# Bluetooth
+bluez
+blueman
+
+# Screenshot e gravação
+obs-studio
+flameshot
+
+# Browsers
+firefox-esr

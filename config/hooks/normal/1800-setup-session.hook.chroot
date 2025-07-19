@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Script para configurar LightDM e sessão Hyprland
+
+set -e
+
+echo "Configurando LightDM e sessão Hyprland..."
+
+# Configurar LightDM
+cat > /etc/lightdm/lightdm.conf << 'EOF'
+[Seat:*]
+greeter-session=lightdm-gtk-greeter
+user-session=hyprland
+autologin-user=user
+autologin-user-timeout=5
+EOF
+
+# Configurar tema do LightDM
+cat > /etc/lightdm/lightdm-gtk-greeter.conf << 'EOF'
+[greeter]
+background=/usr/share/pixmaps/hyprland-background.jpg
+theme-name=Adwaita-dark
+icon-theme-name=Papirus-Dark
+font-name=Cantarell 11
+xft-antialias=true
+xft-dpi=96
+xft-hintstyle=hintslight
+xft-rgba=rgb
+show-indicators=~host;~spacer;~clock;~spacer;~layout;~session;~a11y;~power
+show-clock=true
+clock-format=%H:%M, %A %d %B %Y
+position=50%,center 50%,center
+EOF
+
+# Criar arquivo de sessão do Hyprland
+cat > /usr/share/xsessions/hyprland.desktop << 'EOF'
+[Desktop Entry]
+Name=Hyprland
+Comment=An intelligent dynamic tiling Wayland compositor
+Exec=Hyprland
+Type=Application
+EOF
+
+cat > /usr/share/wayland-sessions/hyprland.desktop << 'EOF'
+[Desktop Entry]
+Name=Hyprland
+Comment=An intelligent dynamic tiling Wayland compositor
+Exec=Hyprland
+Type=Application
+EOF
+
+# Criar usuário padrão
+useradd -m -s /usr/bin/fish -G sudo,docker,audio,video,plugdev,netdev user
+echo "user:user" | chpasswd
+
+# Habilitar serviços necessários
+systemctl enable lightdm
+systemctl enable NetworkManager
+systemctl enable bluetooth
+systemctl enable docker
+systemctl enable postgresql
+systemctl enable redis-server
+
+# Configurar autologin
+echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/user
+
+# Criar wallpaper padrão
+mkdir -p /usr/share/pixmaps
+wget -O /usr/share/pixmaps/hyprland-background.jpg https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3 || true
+
+# Configurar Fish como shell padrão
+echo "/usr/bin/fish" >> /etc/shells
+chsh -s /usr/bin/fish user
+
+echo "Configuração do LightDM e sessão concluída!"

@@ -1,6 +1,21 @@
 #!/bin/sh
 
+# FTH OS - Configuração automática do live-build
+
 lb config noauto \
+    --distribution bookworm \
+    --archive-areas "main contrib non-free non-free-firmware" \
     --debootstrap-options "--include=ca-certificates" \
-    --bootappend-live "boot=live components live-config.no_kernel_upgrade=1" \
+    --image-name "fth-os" \
+    --iso-volume "FTH OS" \
+    --iso-application "FTH OS - Ultimate Web Development Linux" \
+    --iso-publisher "FTH Team" \
+    --bootappend-live "boot=live components quiet splash live-config.username=user live-config.user-default-groups=audio,cdrom,dip,floppy,video,plugdev,netdev,powerdev,scanner,bluetooth,lpadmin,sudo,docker live-config.user-fullname=\"FTH User\" live-config.hostname=fth-os live-config.timezone=America/Sao_Paulo live-config.locales=pt_BR.UTF-8" \
+    --linux-flavours amd64 \
+    --bootloader grub-efi \
+    --cache true \
+    --compression xz \
+    --security true \
+    --updates true \
+    --backports false \
     "${@}"

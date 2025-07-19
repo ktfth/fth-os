@@ -1,0 +1,81 @@
+# Flatpak
+flatpak
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+xdg-desktop-portal-hyprland
+
+# Fontes adicionais
+fonts-powerline
+fonts-liberation
+fonts-dejavu
+fonts-opensymbol
+fonts-noto-cjk
+fonts-noto-extra
+fonts-roboto
+fonts-ubuntu
+fonts-hack
+
+# Codecs e suporte multimídia
+gstreamer1.0-plugins-base
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
+gstreamer1.0-libav
+ffmpeg
+x264
+x265
+lame
+faac
+faad
+
+# Drivers e firmware
+firmware-linux
+firmware-linux-nonfree
+firmware-misc-nonfree
+firmware-iwlwifi
+firmware-atheros
+firmware-realtek
+intel-microcode
+amd64-microcode
+
+# Performance e gaming
+gamemode
+mangohud
+steam-devices
+
+# Utilitários de sistema
+ufw
+gufw
+preload
+zram-tools
+earlyoom
+thermald
+tlp
+tlp-rdw
+
+# Compression tools
+p7zip-full
+unzip
+zip
+rar
+unrar-free
+gzip
+bzip2
+xz-utils
+
+# Hardware tools
+lshw
+hwinfo
+inxi
+sensors
+smartmontools
+hdparm
+sdparm
+
+# Network tools
+openssh-client
+openssh-server
+rsync
+wget
+aria2
+speedtest-cli

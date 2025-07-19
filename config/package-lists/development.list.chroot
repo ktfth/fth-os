@@ -1,23 +1,98 @@
+# Essenciais
 curl
+wget
 build-essential
 git
+git-lfs
+
+# Node.js e gerenciadores de pacote modernos
 nodejs
 npm
+yarn
+pnpm
+
+# Python e ferramentas
+python3
+python3-pip
+python3-venv
+python3-dev
+pipx
+
+# Docker e containers
 docker.io
-docker-compose
+docker-compose-v2
+podman
+buildah
+
+# Bancos de dados
+postgresql
+postgresql-contrib
+redis-server
+sqlite3
+
+# Linguagens de programação
+golang
+rustc
+cargo
+openjdk-17-jdk
+php
+composer
+
+# Build tools e C/C++
 cmake
 make
-vim
-python3
-postgresql
+ninja-build
+clang
+llvm
+pkg-config
+
+# Editores e IDEs
+neovim
+micro
+zed
+
+# Ferramentas de linha de comando modernas
 tldr
-golang
 htop
+btop
 screen
+tmux
 ripgrep
 fd-find
 bat
 exa
+lsd
 delta
 zoxide
+fzf
+jq
+yq
+tree
+ncdu
+duf
+procs
+
+# Networking e monitoramento
+nmap
+tcpdump
+wireshark
+netcat-openbsd
+iperf3
+bandwhich
+
+# Ferramentas Git avançadas
+gh
+git-delta
+tig
+lazygit
+
+# Ferramentas de desenvolvimento web
+httpie
+insomnia
+nginx
+
+# Virtualização e VMs
+qemu-kvm
+virt-manager
+libvirt-daemon-system
 

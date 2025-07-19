@@ -1,3 +1,28 @@
 #!/bin/bash
+
+# Configurar target gráfico como padrão
 ln -sf /lib/systemd/system/graphical.target /etc/systemd/system/default.target
+
+# Configurar locale brasileiro
+echo "pt_BR.UTF-8 UTF-8" >> /etc/locale.gen
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen
+
+# Configurar timezone
+ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+
+# Configurar teclado brasileiro
+cat > /etc/default/keyboard << 'EOF'
+XKBMODEL="pc105"
+XKBLAYOUT="br"
+XKBVARIANT="abnt2"
+XKBOPTIONS=""
+EOF
+
+# Habilitar contrib e non-free
+cat > /etc/apt/sources.list << 'EOF'
+deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
+EOF
 
